@@ -56,6 +56,10 @@ public class Card {
 //			tags.forEach(t -> System.out.println(t));
 		}
 
+		public String getSuite() {
+			return suite;
+		}
+
 		public void setSuite(String suite) {
 			this.suite = suite;
 		}

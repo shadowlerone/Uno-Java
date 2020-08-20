@@ -17,6 +17,8 @@ public class Game {
 	private int[] player_order;
 	private byte direction;
 	public Card.PlayCondition playcondition;
+	public String suiteOverride;
+	boolean ignoreDraw;
 	List<Card> options;
 	//End Init
 
@@ -30,6 +32,8 @@ public class Game {
 		direction = 1;
 		draw_count = 0;
 		stack = new Stack();
+		suiteOverride = null;
+		ignoreDraw = false;
 	}
 
 
@@ -57,7 +61,11 @@ public class Game {
 
 		// Collapse the stack.
 		stack.run(this);
-
+		if(suiteOverride !=null)
+			playcondition.suite=suiteOverride;
+		if (ignoreDraw){
+			playcondition.tags.removeIf(n-> (n == Effect.CONSTANTS.DRAW));
+		}
 		// Selects current player.
 		current_player_index = Math.floorMod((current_player_index + (1+skips)*direction), (players.size()));
 		turn_player = players.get(current_player_index);
@@ -78,6 +86,7 @@ public class Game {
 			System.out.println(text.NO_OPTION);
 			System.out.println(text.DRAW(Math.max(draw_count, 1)));
 			draw_count = 0;
+//			suiteOverride = playcondition.suite;
 			return;
 		}
 		play();
@@ -93,7 +102,7 @@ public class Game {
 	private void play() {
 
 		Card c = interaction.SELECT_OPTION(options);
-
+		suiteOverride = null;
 		int played = turn_player.hand.indexOf(c);
 
 		stack.stack_attack.add(c.effect);
@@ -104,6 +113,7 @@ public class Game {
 
 	public void changeSuite(){
 		playcondition.setSuite(deck.suites.get(interaction.SELECT_SUITE(this.deck)));
+		suiteOverride = playcondition.getSuite();
 	}
 
 	public void reverse(){
